@@ -23,16 +23,22 @@ const getToken = async (req) => {
         });
         return token.data;
     } catch (error) {
-        return {"error": error};
+        return "error"
     }
 }
-
+app.get('/', (req, res) => {
+    res.send('<h1>Welcome to the api</h1>. <h2>Hit the /test route passing in the id and secret as x-www-urlencoded values. It is reccomended to use postman for this.</h2>')
+})
 app.get('/test', urlencodedParser, async (req, res) => {
     console.log('jobs route started')
     let token = await getToken(req)
-    let jobs = await axios.get(`https://api.servicefusion.com/v1/jobs?access_token=${token?.access_token}&per-page=50`)
-    let data = jobs.data.items
-    res.send({"message": data})
+    if (token === "error") {
+        res.send({"error": "authentication error"})
+    }else {
+        let jobs = await axios.get(`https://api.servicefusion.com/v1/jobs?access_token=${token?.access_token}&per-page=50`)
+        let data = jobs.data.items
+        res.send({"message": data})
+    }
 })
 
 
